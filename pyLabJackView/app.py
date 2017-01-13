@@ -1,6 +1,6 @@
 """Module managing starting and stopping the application"""
 
-from pyLabJackView import tk
+import Tkinter as tk
 from controller.main import MainController
 
 
@@ -33,15 +33,16 @@ class LabJackViewApp(object, tk.Tk):
             raise KeyError("No controller registered under: {}".format(name))
         self.windows.pop(name)
 
-    def configure(self):
+    def setup(self):
+        self.wm_title("pyLabJackView")
         c = MainController(self)
         self.add_controller("main", c)
-        c.configure()
+        c.setup()
         c.show()
 
     def start(self):
         """Start the application"""
-        self.configure()
+        self.setup()
         self.mainloop()
 
 

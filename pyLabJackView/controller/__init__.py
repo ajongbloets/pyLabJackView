@@ -10,11 +10,14 @@ class Controller(object):
     def __del__(self):
         pass
 
-    def configure(self):
+    def setup(self):
         """Configures the controller (set-up model, window)"""
         raise NotImplementedError
 
     def show(self):
+        raise NotImplementedError
+
+    def close(self):
         raise NotImplementedError
 
     @property
@@ -23,4 +26,8 @@ class Controller(object):
 
     @property
     def window(self):
+        """
+
+        :rtype: pyLabJackView.view.Window
+        """
         return self._window
