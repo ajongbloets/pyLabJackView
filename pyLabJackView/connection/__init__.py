@@ -8,6 +8,7 @@ class Connection(object):
 
     def __init__(self):
         self._lock = RLock()
+        self._connection = None
         self._connected = False
 
     def __del__(self):
@@ -25,9 +26,16 @@ class Connection(object):
     def disconnect(self):
         raise NotImplementedError
 
+    def _create_connection(self):
+        raise NotImplementedError
+
+    def has_connection(self):
+        return self._connection is not None
+
     def is_connected(self):
+        """Whether there is a connection object and the connection is open"""
         with self.lock:
-            state = self._connected
+            state = self.has_connection() and self._connected
         return state
 
 

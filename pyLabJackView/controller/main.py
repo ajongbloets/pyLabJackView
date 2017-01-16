@@ -21,7 +21,9 @@ class MainController(Controller):
         self.window.setup()
 
     def show(self):
+        """What show we do to show the window"""
         self.window.show()
+        self.show_main()
 
     def close(self):
         self.window.close()
@@ -46,7 +48,7 @@ class MainController(Controller):
         """
         if self._plot is None:
             self._plot = PlotControllerThread(self.application, self.window)
-            self._plot.model = RandomXYModel(self._plot)
+            self._plot.model = RandomXYModel()
             self._plot.setup()
             self._plot.start()
         if not self.window.has_view("plot"):

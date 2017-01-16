@@ -1,9 +1,10 @@
 """Define a basic controller"""
 
 from pyLabJackView.model import Model
+from pyLabJackView import ThreadSafeObject
 
 
-class Controller(object):
+class Controller(ThreadSafeObject):
 
     def __init__(self, app, window=None, model=None):
         super(Controller, self).__init__()
@@ -35,10 +36,6 @@ class Controller(object):
         return self._app
 
     @property
-    def lock(self):
-        return self.application.lock
-
-    @property
     def window(self):
         """Return the window
 
@@ -52,7 +49,6 @@ class Controller(object):
 
         """
         return self._model
-
 
     @model.setter
     def model(self, model):

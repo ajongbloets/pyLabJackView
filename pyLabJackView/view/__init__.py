@@ -1,3 +1,5 @@
+"""Implementing basic view objects"""
+from pyLabJackView import ThreadSafeObject
 import sys
 if sys.version_info[0] < 3:
     import Tkinter as tk
@@ -6,8 +8,10 @@ else:
 
 import ttk
 
+__author__ = "Joeri Jongbloets <joeri@jongbloets.net>"
 
-class Frame(ttk.Frame, object):
+
+class Frame(ttk.Frame, ThreadSafeObject):
 
     FONT_FAMILY = "Verdana"
     FONT_SMALL = (FONT_FAMILY, 8)
@@ -19,6 +23,7 @@ class Frame(ttk.Frame, object):
 
         :rtype: Tkinter.Frame
         """
+        ThreadSafeObject.__init__(self)
         ttk.Frame.__init__(self, parent)
         self._controller = controller
         self._parent = parent
@@ -38,6 +43,7 @@ class Frame(ttk.Frame, object):
     def setup(self):
         raise NotImplementedError
 
+    @ThreadSafeObject.thread_safe
     def close(self):
         self.destroy()
 
@@ -57,6 +63,7 @@ class Window(Frame):
         """
         return self._views
 
+    @ThreadSafeObject.thread_safe
     def get_view(self, name):
         """
 
@@ -67,14 +74,17 @@ class Window(Frame):
             KeyError("No view registered under: {}".format(name))
         return self.views[name]
 
+    @ThreadSafeObject.thread_safe
     def has_view(self, name):
         return name in self.views
 
+    @ThreadSafeObject.thread_safe
     def add_view(self, name, frame):
         if self.has_view(name):
             KeyError("Already registered a view under: {}".format(name))
         self.views[name] = frame
 
+    @ThreadSafeObject.thread_safe
     def remove_view(self, name):
         if not self.has_view(name):
             KeyError("No view registered under: {}".format(name))
@@ -86,10 +96,12 @@ class Window(Frame):
     def show(self):
         raise NotImplementedError
 
+    @ThreadSafeObject.thread_safe
     def show_view(self, name):
         v = self.get_view(name)
         v.tkraise()
 
+    @ThreadSafeObject.thread_safe
     def close(self):
         for v in self.views.values():
             v.close()

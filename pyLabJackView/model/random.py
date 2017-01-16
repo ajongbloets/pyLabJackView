@@ -12,21 +12,24 @@ class RandomValueModel(Model):
         self._std = std
         self.reset()
 
+    @Model.thread_safe
     def reset(self):
         self._data = []
 
     def generate(self):
         return normal(self.get_mean(), self.get_std())
 
+    @Model.thread_safe
     def update(self):
         v = self.generate()
-        with self.lock:
-            self._data.append(v)
+        self._data.append(v)
         return self.data
 
+    @Model.thread_safe
     def get_mean(self):
         return self._mean
 
+    @Model.thread_safe
     def get_std(self):
         return self._std
 
@@ -58,28 +61,29 @@ class RandomXYModel(RandomValueModel):
             data = self._data[:]
         return data
 
+    @Model.thread_safe
     def reset(self):
-        with self.lock:
-            self._data = ([], [])
+        self._data = ([], [])
 
     def generate(self):
         x = self._last_x() + 1
         y = super(RandomXYModel, self).generate()
         return x, y
 
+    @Model.thread_safe
     def update(self):
         x, y = self.generate()
         self.add_xy(x, y)
         return self.data
 
+    @Model.thread_safe
     def add_xy(self, x, y):
-        with self.lock:
-            self._data[0].append(x)
-            self._data[1].append(y)
+        self._data[0].append(x)
+        self._data[1].append(y)
 
+    @Model.thread_safe
     def _last_x(self):
         x = 0
-        with self.lock:
-            if len(self.data[0]) > 0:
-                x = self.data[0][-1]
+        if len(self.data[0]) > 0:
+            x = self.data[0][-1]
         return x

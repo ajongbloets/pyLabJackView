@@ -1,21 +1,19 @@
 """Model class"""
 
-from threading import RLock
+from pyLabJackView import ThreadSafeObject
 
 
-class Model(object):
+class Model(ThreadSafeObject):
 
     def __init__(self):
+        super(Model, self).__init__()
         self._data = None
-        self._lock = RLock()
 
     @property
     def data(self):
-        return self._data
-
-    @property
-    def lock(self):
-        return self._lock
+        with self.lock:
+            result = self._data
+        return result
 
     def update(self):
         """Request the model to update it self"""
