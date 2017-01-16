@@ -1,12 +1,15 @@
 """Module managing starting and stopping the application"""
 
-import Tkinter as tk
+from view import tk
 from controller.main import MainController
+from threading import RLock
 
 
 class LabJackViewApp(object, tk.Tk):
     """The app is the starting stub"""
-    
+
+    lock = RLock()
+
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         self._controllers = {}
@@ -28,10 +31,10 @@ class LabJackViewApp(object, tk.Tk):
             raise KeyError("Already registered a controller under: {}".format(name))
         self.controllers[name] = controller
 
-    def remove_window(self, name):
-        if not self.has_window(name):
+    def remove_controller(self, name):
+        if not self.has_controller(name):
             raise KeyError("No controller registered under: {}".format(name))
-        self.windows.pop(name)
+        self.controllers.pop(name)
 
     def setup(self):
         self.wm_title("pyLabJackView")
@@ -42,8 +45,16 @@ class LabJackViewApp(object, tk.Tk):
 
     def start(self):
         """Start the application"""
-        self.setup()
+        with self.lock:
+            self.setup()
+        # in the main loop we wait, so we do not need a lock
         self.mainloop()
+        with self.lock:
+            self.quit()
+
+    def quit(self):
+        self.remove_controller("main")
+        super(LabJackViewApp, self).quit()
 
 
 if __name__ == "__main__":

@@ -1,6 +1,7 @@
-try:
+import sys
+if sys.version_info[0] < 3:
     import Tkinter as tk
-except ImportError:
+else:
     import tkinter as tk
 
 import ttk
@@ -34,8 +35,10 @@ class Frame(ttk.Frame, object):
         """
         return self._controller
 
+    def setup(self):
+        raise NotImplementedError
+
     def close(self):
-        self
         self.destroy()
 
 
@@ -86,6 +89,11 @@ class Window(Frame):
     def show_view(self, name):
         v = self.get_view(name)
         v.tkraise()
+
+    def close(self):
+        for v in self.views.values():
+            v.close()
+
 
 class View(Frame):
     """A view is a frame inside a window"""

@@ -2,6 +2,8 @@
 
 from . import *
 
+__author__ = "Joeri Jongbloets <joeri@jongbloets.net>"
+
 
 class MainWindow(Window):
     """"""
@@ -27,6 +29,7 @@ class MainWindow(Window):
 
 
 class MainView(View):
+    """"""
 
     def __init__(self, parent, window):
         super(MainView, self).__init__(parent, window)
@@ -49,4 +52,4 @@ class MainView(View):
         button.pack()
 
     def show_plot(self):
-        self.controller.goto_plot()
+        self.controller.show_plot()

@@ -1,14 +1,20 @@
 """Define a basic controller"""
 
+from pyLabJackView.model import Model
+
 
 class Controller(object):
 
-    def __init__(self, app):
+    def __init__(self, app, window=None, model=None):
+        super(Controller, self).__init__()
         self._app = app
-        self._window = None
+        # handle to the window (main responsible view)
+        self._window = window
+        # handle to the model
+        self._model = model
 
     def __del__(self):
-        pass
+        self.close()
 
     def setup(self):
         """Configures the controller (set-up model, window)"""
@@ -22,12 +28,34 @@ class Controller(object):
 
     @property
     def application(self):
+        """Return reference to the application object
+
+        :rtype: pyLabJackView.app.LabJackViewApp
+        """
         return self._app
 
     @property
+    def lock(self):
+        return self.application.lock
+
+    @property
     def window(self):
-        """
+        """Return the window
 
         :rtype: pyLabJackView.view.Window
         """
         return self._window
+
+    @property
+    def model(self):
+        """Return the model
+
+        """
+        return self._model
+
+
+    @model.setter
+    def model(self, model):
+        if not isinstance(model, Model):
+            raise ValueError("Invalid model")
+        self._model = model
