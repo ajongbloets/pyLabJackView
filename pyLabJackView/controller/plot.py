@@ -1,8 +1,7 @@
 from . import Controller
+from pyLabJackView.model.random import RandomXYModel
 from pyLabJackView.view.main import MainWindow
 from pyLabJackView.view.plot import PlotView
-from threading import Thread, Timer, Event
-import time
 
 __author__ = "Joeri Jongbloets <joer@jongbloets.net>"
 
@@ -10,7 +9,28 @@ __author__ = "Joeri Jongbloets <joer@jongbloets.net>"
 class PlotController(Controller):
 
     def __init__(self, app, window=None, model=None):
+        if model is None:
+            model = RandomXYModel()
         super(PlotController, self).__init__(app, window=window, model=model)
+        self._update_interval = 1
+        self._update_state = False
+
+    @property
+    def update_interval(self):
+        return self._update_interval
+
+    @update_interval.setter
+    def update_interval(self, v):
+        if 0 <= v <= 300:
+            self._update_interval = v
+
+    @property
+    def update_state(self):
+        return self._update_state
+
+    @update_state.setter
+    def update_state(self, v):
+        self._update_state = v is True
 
     def setup(self, window=None):
         if window is None:
@@ -26,57 +46,20 @@ class PlotController(Controller):
 
     def show(self):
         self.window.show_view('plot')
-
-    def close(self):
-        if self.window.has_view("plot"):
-            self.window.get_view("plot").destroy()
-            self.window.remove_view("plot")
-        # clean up
-
-
-class PlotControllerThread(PlotController, Thread):
-    """This controller runs from a separate thread"""
-
-    def __init__(self, app, window=None, model=None):
-        super(PlotControllerThread, self).__init__(app, window=window, model=model)
-        self._window = window
-        self._interval = 1  # in seconds
-        self._timer = None
-        self._exit = Event()
-        self._exited = Event()
-
-    @property
-    def interval(self):
-        with self.lock:
-            v = self._interval
-        return v
-
-    @interval.setter
-    def interval(self, v):
-        if 0 <= v <= 1800:
-            with self.lock:
-                self._interval = v
+        self._update_state = True
+        self.window.after(self.update_interval, self.update)
 
     def update(self):
-        if not self._exit.isSet():
-            with self.lock:
-                data = self.model.update()[:]
-                # now re-plot
-                v = self.window.get_view("plot")
-                """:type: pyLabJackView.view.plot.PlotView"""
-                v.plot.plot(data[0], data[1], clear=True)
-            self.window.update_idletasks()
-            with self.lock:
-                i = self._interval
-            self.window.after(i * 1000, self.update)
-        else:
-            self._exited.set()
-
-    def run(self):
-        self._exit.clear()
-        self.update()
+        if self.update_state:
+            data = self.model.update()[:]
+            # now re-plot
+            v = self.window.get_view("plot")
+            """:type: pyLabJackView.view.plot.PlotView"""
+            v.plot.plot(data[0], data[1], clear=True)
+            self.window.after(self.update_interval * 1000, self.update)
 
     def close(self):
-        self._exited.clear()
-        self._exit.set()
-        self._exited.wait()
+        self._update_state = False
+        if self.window.has_view("plot"):
+            self.window.remove_view("plot")
+        # clean up

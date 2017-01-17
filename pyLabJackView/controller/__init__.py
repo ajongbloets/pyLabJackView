@@ -24,6 +24,9 @@ class Controller(ThreadSafeObject):
     def show(self):
         raise NotImplementedError
 
+    def hide(self):
+        raise NotImplementedError
+
     def close(self):
         raise NotImplementedError
 

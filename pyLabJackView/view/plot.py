@@ -32,7 +32,7 @@ class PlotFrame(Frame):
         self._setup_toolbar()
 
     def _setup_toolbar(self):
-        self._toolbar = NavigationToolbar2TkAgg(self.canvas, self)
+        self._toolbar = NavigationToolbar2TkAgg(self.canvas, self.parent)
         self.toolbar.update()
         self.canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 

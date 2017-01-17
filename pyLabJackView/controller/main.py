@@ -1,9 +1,8 @@
 
 from . import Controller
-from pyLabJackView.model.random import RandomXYModel
-from pyLabJackView.controller.plot import PlotControllerThread
-from pyLabJackView.view.main import MainWindow, MainView
-from pyLabJackView.view.plot import PlotView
+from pyLabJackView.controller.plot import PlotController
+from pyLabJackView.controller.labjack import LabJackController
+from pyLabJackView.view.main import MainWindow
 
 __author__ = "Joeri Jongbloets <joeri@jongbloets.net>"
 
@@ -26,19 +25,8 @@ class MainController(Controller):
         self.show_main()
 
     def close(self):
+        self.window.remove_view("main")
         self.window.close()
-
-    def load_main_view(self):
-        """Creates a main view if necessary.
-
-        :return:
-        :rtype: pyLabJackView.view.main.MainView
-        """
-        if not self.window.has_view("main"):
-            v = MainView(self.window, self)
-            self.window.add_view("main", v)
-            v.setup()
-        return self.window.has_view("main")
 
     def load_plot_view(self):
         """Creates a plot view if necessary.
@@ -46,25 +34,26 @@ class MainController(Controller):
         :return:
         :rtype: pyLabJackView.view.plot.PlotView
         """
-        if self._plot is None:
-            self._plot = PlotControllerThread(self.application, self.window)
-            self._plot.model = RandomXYModel()
-            self._plot.setup()
-            self._plot.start()
-        if not self.window.has_view("plot"):
-            v = PlotView(self.window, self._plot)
-            self.window.add_view("plot", v)
-            v.setup()
-        return self.window.has_view("plot")
+        if not self.application.has_controller("plot"):
+            c = PlotController(self.application, self.window)
+            self.application.add_controller("plot", c)
+            c.setup()
+        return self.application.has_controller("plot")
+
+    def load_labjack_view(self):
+        if not self.application.has_controller("labjack"):
+            c = LabJackController(self.application, self.window)
+            self.application.add_controller("labjack", c)
+            c.setup()
+        return self.application.has_controller("labjack")
 
     def show_main(self):
-        # stop PlotController
-        if self._plot is not None:
-            self._plot.close()
-        self.load_main_view()
         self.window.show_view("main")
 
+    def show_labjack(self):
+        self.load_labjack_view()
+        self.application.get_controller("labjack").show()
+
     def show_plot(self):
-        # load PlotController
         self.load_plot_view()
-        self.window.show_view("plot")
+        self.application.get_controller("plot").show()

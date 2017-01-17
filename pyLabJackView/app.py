@@ -16,6 +16,11 @@ class LabJackViewApp(object, tk.Tk):
 
     @property
     def controllers(self):
+        """
+
+        :return:
+        :rtype: dict[str, pyLabJackView.controller.Controller]
+        """
         return self._controllers
 
     def get_controller(self, name):
@@ -53,8 +58,11 @@ class LabJackViewApp(object, tk.Tk):
             self.quit()
 
     def quit(self):
-        self.remove_controller("main")
-        super(LabJackViewApp, self).quit()
+        while len(self.controllers) > 0:
+            name = self.controllers.keys()[0]
+            self.get_controller(name).close()
+            self.remove_controller(name)
+        tk.Tk.quit(self)
 
 
 if __name__ == "__main__":

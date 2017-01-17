@@ -1,9 +1,9 @@
 """Controller for interacting with a labjack"""
 
-from pyLabJackView.model import labjack
+from pyLabJackView.model.labjack import LabJackModel
+from pyLabJackView.view.labjack import LabjackPlotView
+from pyLabJackView.view.main import MainWindow
 from plot import PlotController
-from threading import Thread, Event
-import time
 
 __author__ = "Joeri Jongbloets <joeri@jongbloets.net>"
 
@@ -13,51 +13,37 @@ class LabJackController(PlotController):
 
     def __init__(self, app, window=None, model=None):
         if model is None:
-            model = labjack.LabJackModel()
+            model = LabJackModel()
         super(LabJackController, self).__init__(app, window=window, model=model)
 
+    def setup(self, window=None):
+        if window is None:
+            window = self._window
+        if window is None:
+            self._window = MainWindow(self.application, self)
+        self.window.setup()
+        # now add
+        if not self.window.has_view("labjack"):
+            v = LabjackPlotView(self.window, self)
+            self.window.add_view("labjack", v)
+            v.setup()
+
     def show(self):
-        pass
+        self.window.show_view('labjack')
+        self._update_state = True
+        self.window.after(self.update_interval, self.update)
 
-    def show_labjack_plot(self):
-        pass
-
-    @PlotController.thread_safe
     def update(self):
-        pass
-
-    def update_labjack_plot(self):
-        pass
+        if self.update_state:
+            # data = self.model.update()[:]
+            # now re-plot
+            # v = self.window.get_view("labjack")
+            # """:type: pyLabJackView.view.plot.PlotView"""
+            # v.plot.plot(data[0], data[1], clear=True)
+            self.window.after(self.update_interval * 1000, self.update)
 
     def close(self):
-        pass
-
-    def close_labjack_plot(self):
-        pass
-
-
-class LabJackControllerThread(LabJackController, Thread):
-
-    def __init__(self, app, window=None, model=None):
-        super(LabJackControllerThread, self).__init__(app, window=window, model=model)
-        self._interval = 1  # in seconds
-        self._exit = Event()  # signals whether the thread should stop
-        self._update = Event()   # signals whether the thread should update
-
-    @property
-    def interval(self):
-        with self.lock:
-            result = self._interval
-        return result
-
-    def run(self):
-        # start of thread
-        self.execute()
-
-    def execute(self):
-        if not self._exit.isSet():
-            with self.lock:
-                self.update()
-        if not self._exit.isSet():
-            i = self.interval
-            self.window.after(i, self.execute)
+        self._update_state = False
+        if self.window.has_view("labjack"):
+            self.window.remove_view("labjack")
+        # clean up

@@ -57,8 +57,7 @@ class RandomXYModel(RandomValueModel):
         :return:
         :rtype: tuple[list[float | int], list[float, int]]
         """
-        with self.lock:
-            data = self._data[:]
+        data = self._data[:]
         return data
 
     @Model.thread_safe
