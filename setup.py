@@ -36,7 +36,7 @@ setup(
     author_email='joeri@jongbloets.net',
 
     # Choose your license
-    license='GPLv3',
+    license='MIT',
 
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
