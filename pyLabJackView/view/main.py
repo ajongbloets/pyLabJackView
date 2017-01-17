@@ -13,7 +13,7 @@ class MainWindow(Window):
         self._current_view = None
 
     def setup(self):
-        self.pack(side="top", fill="both", expand=True)
+        self.configure_grid(self)
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
         if not self.has_view("main"):
@@ -44,17 +44,19 @@ class MainView(View):
         return super(MainView, self).controller
 
     def setup(self):
-        self.grid(row=0, column=0, sticky="nsew")
+        self.configure_grid(self)
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=1)
         # label
         label = ttk.Label(self, text="This is the show page", font=self.FONT_LARGE)
-        label.pack(pady=10, padx=10)
-        # button for plot
+        label.grid(row=0, column=0, columnspan=2)
+        # button for add_plot
         button = ttk.Button(
-            self, text="Show plot", command=self.controller.show_plot
+            self, text="Show add_plot", command=self.controller.show_plot
         )
-        button.pack()
-        # button for plot
+        button.grid(row=1, column=0)
+        # button for add_plot
         button = ttk.Button(
             self, text="Show labjack", command=self.controller.show_labjack
         )
-        button.pack()
+        button.grid(row=1, column=2)

@@ -1,7 +1,7 @@
 """Define a basic controller"""
 
 from pyLabJackView.model import Model
-from pyLabJackView import ThreadSafeObject
+from pyLabJackView import *
 
 
 class Controller(ThreadSafeObject):

@@ -94,7 +94,7 @@ class LabJackConnection(Connection):
                 self._connection.getCalibrationData()
                 self._connected = True
                 result = self.is_connected()
-                self.readInfo()
+                self.read_info()
             except u6.LabJackException as lje:
                 pass
         return result
@@ -105,16 +105,15 @@ class LabJackConnection(Connection):
         return self.has_connection()
 
     def disconnect(self):
-        result = False
         with self.lock:
             if self.is_connected():
                 self._connection.close()
                 self._connected = False
                 self._serial_nr = None
                 self._local_id = None
-        return result
+        return not self.is_connected()
 
-    def readInfo(self):
+    def read_info(self):
         """Reads some basic configuration information of the u6"""
         result = {}
         with self.lock:
