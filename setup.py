@@ -85,7 +85,7 @@ setup(
         # 'TkInter',
         # 'ttk',
         'matplotlib',
-        'pandas',
+        'numpy',
     ],
 
     # List additional groups of dependencies here (e.g. development

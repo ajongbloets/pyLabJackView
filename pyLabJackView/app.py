@@ -43,6 +43,9 @@ class LabJackViewApp(object, tk.Tk):
 
     def setup(self):
         self.wm_title("pyLabJackView")
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
+        self.resizable(True, False)
         c = MainController(self)
         self.add_controller("main", c)
         c.setup()

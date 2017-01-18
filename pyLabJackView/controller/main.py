@@ -22,14 +22,14 @@ class MainController(Controller):
     def show(self):
         """What show we do to show the window"""
         self.window.show()
-        self.show_main()
+        self.show_labjack()
 
     def close(self):
         self.window.remove_view("main")
         self.window.close()
 
     def load_plot_view(self):
-        """Creates a plot view if necessary.
+        """Creates a add_plot view if necessary.
 
         :return:
         :rtype: pyLabJackView.view.plot.PlotView
@@ -47,13 +47,30 @@ class MainController(Controller):
             c.setup()
         return self.application.has_controller("labjack")
 
+    def hide_main(self):
+        if self.window.has_view("main"):
+            self.window.hide_view("main")
+
     def show_main(self):
+        self.hide_labjack()
         self.window.show_view("main")
 
+    def hide_labjack(self):
+        if self.window.has_view("labjack"):
+            self.window.hide_view("labjack")
+
     def show_labjack(self):
+        self.hide_main()
+        self.hide_plot()
         self.load_labjack_view()
         self.application.get_controller("labjack").show()
 
+    def hide_plot(self):
+        if self.window.has_view("plot"):
+            self.window.hide_view("plot")
+
     def show_plot(self):
+        self.hide_main()
+        self.hide_labjack()
         self.load_plot_view()
         self.application.get_controller("plot").show()

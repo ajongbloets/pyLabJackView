@@ -2,6 +2,17 @@
 from threading import RLock
 
 
+class PyLabJackViewException(BaseException):
+
+    def __init__(self, msg=None):
+        if msg is None:
+            self._msg = ""
+        self._msg = msg
+
+    def __str__(self):
+        return self._msg
+
+
 class ThreadSafeObject(object):
     """A class providing infrastructure for creating thread-safe objects"""
 
