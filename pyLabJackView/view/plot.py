@@ -1,8 +1,8 @@
 """A simple view with a plot"""
 
-from . import *
-import matplotlib
+from julesTk.view import *
 
+import matplotlib
 matplotlib.use("TkAgg")
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 from matplotlib.figure import Figure
@@ -11,8 +11,8 @@ from matplotlib.figure import Figure
 class PlotFrame(Frame):
     """Only the Plot as a frame object"""
 
-    def __init__(self, parent, controller):
-        super(PlotFrame, self).__init__(parent, controller)
+    def __init__(self, parent):
+        super(PlotFrame, self).__init__(parent)
         self._figure = None
         self._canvas = None
         self._toolbar = None
@@ -111,7 +111,7 @@ class PlotView(View):
         self.setup_plot()
 
     def setup_plot(self):
-        self._plot = PlotFrame(self, self.controller)
+        self._plot = PlotFrame(self)
         self.plot.setup()
         # self.add_plot.add_plot([0, 1, 2, 3, 4], [1, 2, 4, 8, 16])
 
@@ -179,7 +179,7 @@ class LivePlotView(PlotView):
         self.setup_plot()
 
     def setup_plot(self):
-        self._plot = PlotFrame(self, self.controller)
+        self._plot = PlotFrame(self)
         self.plot.setup()
         self.plot.grid(row=3, column=0, columnspan=3)
 

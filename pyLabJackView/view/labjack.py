@@ -1,8 +1,7 @@
 """Module with view showing labjack measurements"""
 
-from . import *
+from julesTk.view import *
 from plot import PlotFrame
-from matplotlib import colors
 import numpy as np
 from datetime import datetime as dt
 
@@ -12,8 +11,8 @@ __author__ = "Joeri Jongbloets <joeri@jongbloets.net>"
 class LabJackPlotFrame(PlotFrame):
     """Frame capable of plotting labjack data"""
 
-    def __init__(self, parent, controller):
-        super(LabJackPlotFrame, self).__init__(parent, controller)
+    def __init__(self, parent):
+        super(LabJackPlotFrame, self).__init__(parent)
         self._t_zero = None
         self._lines = {}
 
@@ -39,7 +38,6 @@ class LabJackPlotFrame(PlotFrame):
         self._t_zero = dt.now()
 
     def update_line(self, ain, x, y):
-        xlim, ylim = None, None
         if not isinstance(x, (tuple, list)):
             x = x,
         if not isinstance(y, (tuple, list)):
@@ -236,7 +234,7 @@ class LabJackView(View):
     def setup_plot(self, parent=None):
         if parent is None:
             parent = self
-        self.add_widget("add_plot", LabJackPlotFrame(parent, self.controller))
+        self.add_widget("add_plot", LabJackPlotFrame(parent))
         self.plot.setup()
         self.configure_grid(self.plot, row=3, column=0, columnspan=2)
         self.plot.grid_columnconfigure(0, weight=1)
