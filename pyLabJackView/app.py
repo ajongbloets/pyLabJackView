@@ -1,7 +1,7 @@
 """Module managing starting and stopping the application"""
 
 from julesTk.app import Application
-from controller.main import MainController
+from controller.labjack import LabJackController
 
 
 class LabJackViewApp(Application):
@@ -15,7 +15,7 @@ class LabJackViewApp(Application):
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
         self.resizable(True, False)
-        c = MainController(self)
+        c = LabJackController(self)
         self.add_controller("main", c)
         c.setup()
 
