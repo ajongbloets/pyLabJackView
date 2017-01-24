@@ -125,13 +125,15 @@ class LabJackConnection(Connection):
                 self._local_id = result.get("LocalID", None)
         return result
 
-    def measure_ain(self, channel, resolution=12, gain=1):
+    def measure_ain(self, channel, resolution=12, gain=1, differential=False):
         """Read the voltage from the Analog In"""
         result = 0.0
         with self.lock:
             if self.is_connected():
                 try:
-                    result = self._connection.getAIN(channel, resolutionIndex=resolution, gainIndex=gain)
+                    result = self._connection.getAIN(
+                        channel, resolutionIndex=resolution, gainIndex=gain, differential=differential
+                    )
                 except:
                     pass
         return result

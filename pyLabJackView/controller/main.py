@@ -18,6 +18,7 @@ class MainController(Controller):
             window = MainWindow(self.application, self)
         self._window = window
         self.window.setup()
+        return self
 
     def show(self):
         """What show we do to show the window"""
