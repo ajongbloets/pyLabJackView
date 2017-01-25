@@ -1,8 +1,7 @@
 """Module with view showing labjack measurements"""
 
-from . import *
-from plot import PlotFrame
-from matplotlib import colors
+from julesTk.view import *
+from julesTk.view.plot import PlotFrame
 import numpy as np
 from datetime import datetime as dt
 
@@ -12,8 +11,8 @@ __author__ = "Joeri Jongbloets <joeri@jongbloets.net>"
 class LabJackPlotFrame(PlotFrame):
     """Frame capable of plotting labjack data"""
 
-    def __init__(self, parent, controller):
-        super(LabJackPlotFrame, self).__init__(parent, controller)
+    def __init__(self, parent):
+        super(LabJackPlotFrame, self).__init__(parent)
         self._t_zero = None
         self._lines = {}
 
@@ -36,10 +35,9 @@ class LabJackPlotFrame(PlotFrame):
     def clear(self):
         self._lines = {}
         super(LabJackPlotFrame, self).clear()
-        self._t_zero = dt.now()
+        self._t_zero = None
 
     def update_line(self, ain, x, y):
-        xlim, ylim = None, None
         if not isinstance(x, (tuple, list)):
             x = x,
         if not isinstance(y, (tuple, list)):
@@ -193,23 +191,25 @@ class LabJackView(View):
         # add ains
         ain_frm = ttk.Frame(parent)
         self.configure_grid(ain_frm, row=0, column=0)
-        lbl = ttk.Label(ain_frm, text="AIN ports to read")
+        lbl = ttk.Label(ain_frm, text="Analog Inputs")
         self.configure_grid(lbl, sticky="n", row=0, column=0)
         for ain in range(14):
             row = ain % 7
             column = ain // 7
             w = self.new_ain_widget(ain, parent=ain_frm)
             self.configure_grid(w, sticky="w", row=row+1, column=column)
-        ain_frm.grid_columnconfigure(0, weight=1)
-        ain_frm.grid_columnconfigure(1, weight=1)
+        self.configure_column(ain_frm, [0, 1])
         # add mios
-        mio_frm = ttk.Frame(parent)
-        self.configure_grid(mio_frm, row=0, column=1)
-        lbl = ttk.Label(mio_frm, text="MIO Settings")
+        dio_frm = ttk.Frame(parent)
+        self.configure_grid(dio_frm, row=0, column=1)
+        self.configure_column(dio_frm, [0, 1])
+        lbl = ttk.Label(dio_frm, text="Digital I/O")
         self.configure_grid(lbl, sticky="nw", row=0, column=0)
-        for mio in range(3):
-            w = self.new_mio_widget(mio, parent=mio_frm)
-            self.configure_grid(w, sticky="w", row=mio+1, column=0)
+        for dio in range(20):
+            row = dio % 10
+            column = dio // 10
+            w = self.new_dio_widget(dio, parent=dio_frm)
+            self.configure_grid(w, sticky="w", row=row+1, column=column)
 
     def new_ain_widget(self, ain, parent=None):
         if parent is None:
@@ -222,13 +222,13 @@ class LabJackView(View):
         )
         return self.add_widget(name, cb)
 
-    def new_mio_widget(self, mio, parent=None):
+    def new_dio_widget(self, dio, parent=None):
         if parent is None:
             parent = self
-        name = "mio_%s" % mio
+        name = "dio_%s" % dio
         v = self.add_variable(name, tk.IntVar())
         cb = ttk.Checkbutton(
-            parent, text=name.upper(), command=lambda: self.toggle_mio(mio),
+            parent, text=name.upper(), command=lambda: self.toggle_dio(dio),
             variable=v
         )
         return self.add_widget(name, cb)
@@ -236,7 +236,7 @@ class LabJackView(View):
     def setup_plot(self, parent=None):
         if parent is None:
             parent = self
-        self.add_widget("add_plot", LabJackPlotFrame(parent, self.controller))
+        self.add_widget("add_plot", LabJackPlotFrame(parent))
         self.plot.setup()
         self.configure_grid(self.plot, row=3, column=0, columnspan=2)
         self.plot.grid_columnconfigure(0, weight=1)
@@ -316,7 +316,7 @@ class LabJackView(View):
         v = self.get_variable(name)
         self.controller.toggle_ain(ain, v.get())
 
-    def toggle_mio(self, mio):
-        name = "mio_%s" % mio
+    def toggle_dio(self, dio):
+        name = "dio_%s" % dio
         v = self.get_variable(name)
-        self.controller.toggle_mio(mio, v.get())
+        self.controller.toggle_dio(dio, v.get())

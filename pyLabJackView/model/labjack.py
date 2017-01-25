@@ -1,4 +1,4 @@
-from . import Model
+from julesTk.model import Model
 from datetime import datetime as dt
 
 
@@ -39,6 +39,7 @@ class LabJackModel(Model):
         if 0 <= v <= 13:
             with self.lock:
                 self._resolution = int(v)
+        self.notify_observers()
 
     @property
     def gain(self):
@@ -51,6 +52,7 @@ class LabJackModel(Model):
         if v in [0, 1, 2, 3, 15]:
             with self.lock:
                 self._gain = int(v)
+        self.notify_observers()
 
     @Model.thread_safe
     def reset(self):
@@ -61,6 +63,7 @@ class LabJackModel(Model):
         """Updates the data"""
         for ain in self.channels:
             self._data[ain].update()
+        self.notify_observers()
         return self._data
 
     @Model.thread_safe
@@ -83,6 +86,7 @@ class LabJackModel(Model):
         if not self.has_channel(ain):
             model = LabJackAinModel(self.connection, ain, self.resolution, self.gain)
             self._data[ain] = model
+            self.notify_observers()
         else:
             model = self._data[ain]
         return model
@@ -92,16 +96,7 @@ class LabJackModel(Model):
         if not self.has_channel(ain):
             raise KeyError("AIN not registered to this model: {}".format(ain))
         self._data.pop(ain)
-
-    @Model.thread_safe
-    def add_measurement(self, ain, value, **kwargs):
-        v = kwargs.copy()
-        v["time"] = dt.now()
-        v["value"] = value
-        if ain in self._data.keys():
-            self._data[ain].append(v)
-        else:
-            self._data[ain] = [v]
+        self.notify_observers()
 
     @Model.thread_safe
     def read_ain(self, ain, resolution=None, gain=None):
@@ -147,6 +142,7 @@ class LabJackAinModel(LabJackModel):
     @LabJackModel.thread_safe
     def add_measurement(self, ain, value, **kwargs):
         v = kwargs.copy()
+        v["ain"] = ain
         v["time"] = dt.now()
         v["value"] = value
         self._data.append(v)
@@ -157,5 +153,6 @@ class LabJackAinModel(LabJackModel):
         self.add_measurement(
             self.ain, self.read_ain(self.ain, **kwargs), **kwargs
         )
+        self.notify_observers()
         return self._data[:]
 
