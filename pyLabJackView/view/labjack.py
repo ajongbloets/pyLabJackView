@@ -194,20 +194,20 @@ class LabJackView(View):
         lbl = ttk.Label(ain_frm, text="Analog Inputs")
         self.configure_grid(lbl, sticky="n", row=0, column=0)
         for ain in range(14):
-            row = ain % 7
-            column = ain // 7
+            row = ain % 5
+            column = ain // 5
             w = self.new_ain_widget(ain, parent=ain_frm)
             self.configure_grid(w, sticky="w", row=row+1, column=column)
-        self.configure_column(ain_frm, [0, 1])
+        self.configure_column(ain_frm, [0, 1, 2])
         # add mios
         dio_frm = ttk.Frame(parent)
         self.configure_grid(dio_frm, row=0, column=1)
-        self.configure_column(dio_frm, [0, 1])
+        self.configure_column(dio_frm, [0, 1, 2])
         lbl = ttk.Label(dio_frm, text="Digital I/O")
         self.configure_grid(lbl, sticky="nw", row=0, column=0)
         for dio in range(20):
-            row = dio % 10
-            column = dio // 10
+            row = dio % 5
+            column = dio // 5
             w = self.new_dio_widget(dio, parent=dio_frm)
             self.configure_grid(w, sticky="w", row=row+1, column=column)
 
