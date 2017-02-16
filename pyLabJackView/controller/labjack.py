@@ -38,12 +38,12 @@ class LabJackController(Poller):
         """
         return self._connection
 
-    def setup(self, view=None):
+    def _prepare(self, view=None):
         if view is None:
             view = self._view
         if view is None:
             self._view = LabJackView(self.view, self)
-        self.view.setup()
+        self.view.prepare()
         return self
 
     def start(self):

@@ -13,19 +13,19 @@ class MainController(Controller):
         super(MainController, self).__init__(app, window=window, model=model)
         self._plot = None
 
-    def setup(self, window=None):
+    def _prepare(self, window=None):
         if window is None:
             window = MainWindow(self.application, self)
         self._window = window
-        self.window.setup()
+        self.window.prepare()
         return self
 
-    def show(self):
+    def _show(self):
         """What show we do to show the window"""
         self.window.show()
         self.show_labjack()
 
-    def close(self):
+    def _close(self):
         self.window.remove_view("main")
         self.window.close()
 
@@ -45,7 +45,7 @@ class MainController(Controller):
         if not self.application.has_controller("labjack"):
             c = LabJackController(self.application, self.window)
             self.application.add_controller("labjack", c)
-            c.setup()
+            c.prepare()
         return self.application.has_controller("labjack")
 
     def hide_main(self):

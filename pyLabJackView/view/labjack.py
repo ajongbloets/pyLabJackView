@@ -136,7 +136,7 @@ class LabJackView(View):
     def set_status_text(self, str):
         self.variables["status"].set(str)
 
-    def setup(self):
+    def _prepare(self):
         self.configure_grid(self)
         # add widgets
         lbj_ports_frame = ttk.Frame(self)
